@@ -11,52 +11,62 @@ import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
-import junit.framework.TestCase;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-
-
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-public abstract class  AbstractMongoDBTest extends TestCase {
+public class MongoRule implements TestRule {
+
     private static final MongodStarter starter = MongodStarter.getDefaultInstance();
 
     private MongodExecutable _mongodExe;
     private MongodProcess _mongod;
 
     private MongoClient _mongo;
-    @Override
-    protected void setUp() throws Exception {
 
+    public MongoClient getMongo() {
+        return _mongo;
+    }
+
+    private void setUp() throws Exception {
         _mongodExe = starter.prepare(new MongodConfigBuilder()
                 .version(Version.Main.PRODUCTION)
                 .net(new Net("localhost", 12345, Network.localhostIsIPv6()))
                 .build());
         _mongod = _mongodExe.start();
 
-        super.setUp();
 
         CodecRegistry pojoCodecRegistry = fromRegistries(MongoClients.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
-        //_mongo = new MongoClient("localhost", 12345);
         _mongo = MongoClients.create(MongoClientSettings.builder()
                 .codecRegistry(pojoCodecRegistry)
                 .applyConnectionString(new ConnectionString("mongodb://localhost:12345"))
                 .build());
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    private void tearDown() {
         _mongod.stop();
         _mongodExe.stop();
     }
 
-    public MongoClient getMongo() {
-        return _mongo;
+    @Override
+    public Statement apply(Statement base, Description description) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                setUp();
+                try {
+                    base.evaluate();
+                } finally {
+                    tearDown();
+                }
+            }
+        };
     }
 }

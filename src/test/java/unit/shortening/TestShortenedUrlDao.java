@@ -3,41 +3,65 @@ package unit.shortening;
 import app.services.shortening.ShortenedUrl;
 import app.services.shortening.ShortenedUrlDao;
 import app.services.shortening.ShortenedUrlDaoImpl;
+import com.mongodb.MongoWriteException;
 import com.mongodb.async.client.MongoDatabase;
 import org.junit.Assert;
-import util.AbstractMongoDBTest;
+import org.junit.Rule;
+import org.junit.Test;
+import util.MongoRule;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 
-public class TestShortenedUrlDao extends AbstractMongoDBTest {
+public class TestShortenedUrlDao  {
 
+    @Rule
+    public final MongoRule mongoRule = new MongoRule();
 
-    public void testShortenedUrlDaoCreate() {
-        MongoDatabase db = getMongo().getDatabase("test");
+    @Test
+    public void testShortenedUrlDaoCreateRead() {
+        final String LONG_URL = "http://www.cisco.com/api?q=akfvsldnvjknskdnfvds";
+        final String SHORT_URL = "http://goo.gl/akfvsld";
+        final String MISSING_SHORT_URL = "http://goo.gl/jcfqaks";
+        final String DBNAME = "test";
+
+        //Setup
+        MongoDatabase db = mongoRule.getMongo().getDatabase(DBNAME);
         ShortenedUrlDao sud = new ShortenedUrlDaoImpl(db);
-        final CompletableFuture cf_create = new CompletableFuture();
-        sud.createShortenedUrlAsync(new ShortenedUrl("aaa","bbb"),(t)->{cf_create.complete(t);});
-        cf_create.join();
-        final CompletableFuture<ShortenedUrl> cf_get = new CompletableFuture();
-        sud.getShortenedUrlByShortUrlAsyc("aaa",(url,t)->{
-            if (t!=null) cf_get.completeExceptionally(t);
-            else cf_get.complete(url);
-        });
-        Assert.assertEquals("bbb",cf_get.join().getLongUrl());
 
-        final CompletableFuture<ShortenedUrl> cf_get_empty = new CompletableFuture();
-        sud.getShortenedUrlByShortUrlAsyc("vvv",(url,t)->{
-            if (t!=null) cf_get_empty.completeExceptionally(t);
-            else cf_get_empty.complete(url);
-        });
+        //Create model in the database
+        sud.createShortenedUrlAsync(new ShortenedUrl(SHORT_URL,LONG_URL)).join();
 
+        //Get long URL by short URL
+        Assert.assertEquals(LONG_URL,sud.getShortenedUrlByShortUrlAsyc(SHORT_URL).join().getLongUrl());
+
+        //Read missing short URL
+        Assert.assertNull(sud.getShortenedUrlByShortUrlAsyc(MISSING_SHORT_URL).join());
+
+        //Drop db
+        db.drop((aVoid,t)->{});
+    }
+
+    @Test
+    public void testShortenedUrlDaoCreateExisting() {
+        final String LONG_URL = "http://www.cisco.com/api?q=akfvsldnvjknskdnfvds";
+        final String SHORT_URL = "http://goo.gl/akfvsld";
+        final String DBNAME = "test";
+
+        //Setup
+        MongoDatabase db = mongoRule.getMongo().getDatabase(DBNAME);
+        ShortenedUrlDao sud = new ShortenedUrlDaoImpl(db);
+
+        //Create model in the database
+        sud.createShortenedUrlAsync(new ShortenedUrl(SHORT_URL,LONG_URL)).join();
+
+        //Recreate the same model in the database
         try {
-            Assert.assertNull(cf_get_empty.get());
-
-        } catch (ExecutionException|InterruptedException e) {
-            Assert.fail("serach fialed for the non existing url: "+e.getMessage());
+            sud.createShortenedUrlAsync(new ShortenedUrl(SHORT_URL, LONG_URL)).join();
+            Assert.fail("Non uniqe short url was inserted");
+        } catch (CompletionException e) {
+            Assert.assertTrue( e.getCause() instanceof MongoWriteException);
         }
+        //Drop db
         db.drop((aVoid,t)->{});
     }
 }

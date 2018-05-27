@@ -1,11 +1,10 @@
 package app.services.shortening;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 public  interface ShortenedUrlDao {
 
-    public void getShortenedUrlByShortUrlAsyc(String ShortUrl, BiConsumer<ShortenedUrl, Throwable> callback);
+    CompletableFuture<ShortenedUrl> getShortenedUrlByShortUrlAsyc(String ShortUrl);
 
-    public void createShortenedUrlAsync(ShortenedUrl url, Consumer<Throwable> callback);
+    CompletableFuture<Void> createShortenedUrlAsync(ShortenedUrl url);
 }

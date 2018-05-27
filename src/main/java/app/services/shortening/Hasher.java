@@ -14,7 +14,6 @@ public class Hasher {
     private final Base62 base62;
 
     public Hasher(int hashLength) throws NoSuchAlgorithmException {
-
         this.hashLength = hashLength;
         if (hashLength<1||hashLength>22) throw new IllegalArgumentException("Hash length must be less than 31 characters");
         this.md = MessageDigest.getInstance("MD5");

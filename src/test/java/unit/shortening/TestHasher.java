@@ -1,8 +1,8 @@
 package unit.shortening;
 
 import app.services.shortening.Hasher;
-import junit.framework.TestCase;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,23 +11,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-public class TestHasher extends TestCase {
+public class TestHasher {
 
+    @Test
     public void testHasherThrowsExceptionIfHashLengthIsWrong() throws NoSuchAlgorithmException {
         try {
             new Hasher(23);
-            fail("Expected an IllegalArgumentException to be thrown");
+            Assert.fail("Expected an IllegalArgumentException to be thrown");
         } catch (IllegalArgumentException anIllegalArgumentException) {
             Assert.assertEquals("Hash length must be less than 31 characters",anIllegalArgumentException.getMessage());
         }
         try {
             new Hasher(0);
-            fail("Expected an IllegalArgumentException to be thrown");
+            Assert.fail("Expected an IllegalArgumentException to be thrown");
         } catch (IllegalArgumentException anIllegalArgumentException) {
             Assert.assertEquals("Hash length must be less than 31 characters",anIllegalArgumentException.getMessage());
         }
     }
 
+    @Test
     public void testHasherCalculatesHashForUrl() throws NoSuchAlgorithmException, MalformedURLException {
         Hasher hasher = new Hasher(10);
         URL url = new URL("https://www.google.com/");
@@ -36,6 +38,7 @@ public class TestHasher extends TestCase {
         Assert.assertEquals(10,hash.length());
     }
 
+    @Test
     public void testHasherUsesSalt() throws NoSuchAlgorithmException, MalformedURLException {
         Hasher hasher = new Hasher(10);
         URL url = new URL("https://www.google.com/");
@@ -48,6 +51,7 @@ public class TestHasher extends TestCase {
         Assert.assertNotEquals(hash1,hash2);
     }
 
+    @Test
     public void testHasherProducesSafeOutput() throws NoSuchAlgorithmException, MalformedURLException {
         Hasher hasher = new Hasher(22);
         URL url = new URL("https://www.google.com/");

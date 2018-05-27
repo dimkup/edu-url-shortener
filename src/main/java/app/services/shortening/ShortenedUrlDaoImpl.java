@@ -2,43 +2,53 @@ package app.services.shortening;
 
 import com.mongodb.async.client.MongoCollection;
 import com.mongodb.async.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mongodb.client.model.Filters.eq;
 
 
 public class ShortenedUrlDaoImpl implements ShortenedUrlDao {
+    public static final String SHORTENED_URL_COLLECTION_NAME = "urls";
+
     private static Logger log = LoggerFactory.getLogger(ShortenedUrlDaoImpl.class);
 
     private  MongoCollection<ShortenedUrl> shortenedUrlCollection;
 
     public ShortenedUrlDaoImpl( MongoDatabase database) {
-        shortenedUrlCollection = database.getCollection("urls",ShortenedUrl.class);
+        shortenedUrlCollection = database.getCollection(SHORTENED_URL_COLLECTION_NAME,ShortenedUrl.class);
 
-        //Create index on shortUrl field if does not exist
-        shortenedUrlCollection.createIndex(Indexes.text("shortUrl"), (s, t) -> {
-            if (t!=null) {
-                log.error("Can't create index for url collection",t);
-            }
-        });
+        //Create unique index on shortUrl field if does not exist
+        IndexOptions indexOptions = new IndexOptions().unique(true);
+        shortenedUrlCollection.createIndex(
+                Indexes.text("shortUrl"),
+                indexOptions,
+                (s, t) -> {if (t!=null) log.error("Can't create index for url collection",t);});
     }
 
+
     @Override
-    public void getShortenedUrlByShortUrlAsyc(String shortUrl, BiConsumer<ShortenedUrl, Throwable> callback) {
+    public CompletableFuture<ShortenedUrl> getShortenedUrlByShortUrlAsyc(String shortUrl) {
+        CompletableFuture<ShortenedUrl> cf = new CompletableFuture<>();
+
         shortenedUrlCollection.find(eq("shortUrl",shortUrl)).first((url,t)->{
-            if (callback!=null) callback.accept(url,t);
+            if (t!=null) cf.completeExceptionally(t);
+            else cf.complete(url);
         });
+        return cf;
     }
 
     @Override
-    public void createShortenedUrlAsync(ShortenedUrl url, Consumer<Throwable> callback) {
+    public CompletableFuture<Void> createShortenedUrlAsync(ShortenedUrl url) {
+        CompletableFuture<Void> cf = new CompletableFuture<>();
         shortenedUrlCollection.insertOne(url, (aVoid, t) -> {
-            if (callback!=null) callback.accept(t);
+            if (t!=null) cf.completeExceptionally(t);
+            else cf.complete(null);
         });
+        return cf;
     }
 }
