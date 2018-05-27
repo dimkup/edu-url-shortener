@@ -1,21 +1,23 @@
 package unit.shortening;
 
-import app.services.shortening.ShortenedUrl;
-import app.services.shortening.ShortenedUrlDao;
-import app.services.shortening.ShortenedUrlDaoImpl;
+import app.services.shortening.models.ShortenedUrl;
+import app.services.shortening.models.ShortenedUrlDao;
+import app.services.shortening.models.ShortenedUrlDaoImpl;
 import com.mongodb.MongoWriteException;
 import com.mongodb.async.client.MongoDatabase;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import util.MongoRule;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class TestShortenedUrlDao  {
 
-    @Rule
-    public final MongoRule mongoRule = new MongoRule();
+    @ClassRule
+    public static final MongoRule mongoRule = new MongoRule();
 
     @Test
     public void testShortenedUrlDaoCreateRead() {
@@ -38,13 +40,15 @@ public class TestShortenedUrlDao  {
         Assert.assertNull(sud.getShortenedUrlByShortUrlAsyc(MISSING_SHORT_URL).join());
 
         //Drop db
-        db.drop((aVoid,t)->{});
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        db.drop((aVoid,t)->{if (t!=null) cf.completeExceptionally(t); else cf.complete(null);});
+        cf.join();
     }
 
     @Test
     public void testShortenedUrlDaoCreateExisting() {
         final String LONG_URL = "http://www.cisco.com/api?q=akfvsldnvjknskdnfvds";
-        final String SHORT_URL = "http://goo.gl/akfvsld";
+        final String SHORT_URL = "http://goo.gl/jjksdajf";
         final String DBNAME = "test";
 
         //Setup
@@ -62,6 +66,8 @@ public class TestShortenedUrlDao  {
             Assert.assertTrue( e.getCause() instanceof MongoWriteException);
         }
         //Drop db
-        db.drop((aVoid,t)->{});
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        db.drop((aVoid,t)->{if (t!=null) cf.completeExceptionally(t); else cf.complete(null);});
+        cf.join();
     }
 }

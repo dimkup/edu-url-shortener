@@ -1,4 +1,4 @@
-package app.services.shortening;
+package app.services.shortening.models;
 
 import java.util.concurrent.CompletableFuture;
 

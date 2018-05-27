@@ -2,6 +2,9 @@ package app.services.shortening;
 
 import app.services.shortening.exceptions.ShortenedUrlNotFoundException;
 import app.services.shortening.exceptions.ShorteningServiceException;
+import app.services.shortening.models.ShortenedUrl;
+import app.services.shortening.models.ShortenedUrlDao;
+import app.services.shortening.models.ShortenedUrlDaoImpl;
 import com.mongodb.async.client.MongoDatabase;
 
 import java.net.MalformedURLException;

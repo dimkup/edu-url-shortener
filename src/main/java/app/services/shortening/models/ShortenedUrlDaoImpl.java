@@ -1,4 +1,4 @@
-package app.services.shortening;
+package app.services.shortening.models;
 
 import com.mongodb.async.client.MongoCollection;
 import com.mongodb.async.client.MongoDatabase;

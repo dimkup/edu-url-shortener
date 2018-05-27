@@ -5,6 +5,7 @@ import app.services.shortening.ShorteningService;
 import app.services.shortening.exceptions.ShortenedUrlNotFoundException;
 import com.mongodb.async.client.MongoDatabase;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import util.MongoRule;
@@ -15,8 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletionException;
 
 public class TestUrlShorteningService {
-    @Rule
-    public final MongoRule mongoRule = new MongoRule();
+    @ClassRule
+    public static final MongoRule mongoRule = new MongoRule();
 
     @Test
     public void testUrlShorteningServiceShortResolve() throws NoSuchAlgorithmException, MalformedURLException {
@@ -55,7 +56,7 @@ public class TestUrlShorteningService {
         //Resolve
         try {
             ss.resolveUrl(shortUrl).join();
-            Assert.fail("Missing shortUrl resolved!");
+            Assert.fail("Missing shortUrl has been resolved!");
         } catch (CompletionException e) {
             Assert.assertTrue( e.getCause() instanceof ShortenedUrlNotFoundException);
         }
