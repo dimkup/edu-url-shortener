@@ -1,12 +1,12 @@
 package unit.shortening;
 
+import app.config.ConfigShortening;
 import app.services.shortening.ShortUrlConstructor;
 import app.services.shortening.ShorteningService;
 import app.services.shortening.exceptions.ShortenedUrlNotFoundException;
 import com.mongodb.async.client.MongoDatabase;
 import org.junit.Assert;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import util.MongoRule;
 
@@ -29,7 +29,22 @@ public class TestUrlShorteningService {
         //Setup
         MongoDatabase db = mongoRule.getMongo().getDatabase(DBNAME);
         URL longUrl = new URL(LONG_URL);
-        ShorteningService ss = new ShorteningService(db,new ShortUrlConstructor(new URL(BASE_URL),HASH_LEN));
+        ShorteningService ss = new ShorteningService(db, new ConfigShortening() {
+            @Override
+            public URL baseUrl()  {
+                try {
+                    return new URL(BASE_URL);
+                } catch (MalformedURLException e) {
+                    Assert.fail("Can't construct URL");
+                }
+                return null;
+            }
+
+            @Override
+            public Integer hashLen() {
+                return HASH_LEN;
+            }
+        });
 
         //Short
         URL shortUrl = ss.shortenUrl(longUrl).join();
@@ -50,7 +65,22 @@ public class TestUrlShorteningService {
 
         //Setup
         MongoDatabase db = mongoRule.getMongo().getDatabase(DBNAME);
-        ShorteningService ss = new ShorteningService(db,new ShortUrlConstructor(new URL(BASE_URL),HASH_LEN));
+        ShorteningService ss = new ShorteningService(db,new ConfigShortening() {
+            @Override
+            public URL baseUrl()  {
+                try {
+                    return new URL(BASE_URL);
+                } catch (MalformedURLException e) {
+                    Assert.fail("Can't construct URL");
+                }
+                return null;
+            }
+
+            @Override
+            public Integer hashLen() {
+                return HASH_LEN;
+            }
+        });
         URL shortUrl = new URL(SHORT_URL);
 
         //Resolve

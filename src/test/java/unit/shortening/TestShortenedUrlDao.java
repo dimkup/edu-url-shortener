@@ -55,13 +55,13 @@ public class TestShortenedUrlDao  {
         MongoDatabase db = mongoRule.getMongo().getDatabase(DBNAME);
         ShortenedUrlDao sud = new ShortenedUrlDaoImpl(db);
 
-        //Create model in the database
+        //Create a model in the database
         sud.createShortenedUrlAsync(new ShortenedUrl(SHORT_URL,LONG_URL)).join();
 
         //Recreate the same model in the database
         try {
             sud.createShortenedUrlAsync(new ShortenedUrl(SHORT_URL, LONG_URL)).join();
-            Assert.fail("Non uniqe short url was inserted");
+            Assert.fail("Non unique short url was inserted");
         } catch (CompletionException e) {
             Assert.assertTrue( e.getCause() instanceof MongoWriteException);
         }

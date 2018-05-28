@@ -1,5 +1,6 @@
 package app.services.shortening;
 
+import app.config.ConfigShortening;
 import app.services.shortening.exceptions.ShortenedUrlNotFoundException;
 import app.services.shortening.exceptions.ShorteningServiceException;
 import app.services.shortening.models.ShortenedUrl;
@@ -9,17 +10,19 @@ import com.mongodb.async.client.MongoDatabase;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
 
 public class ShorteningService {
     private ShortenedUrlDao shortenedUrlDao;
     private ShortUrlConstructor shortUrlConstructor;
 
-    public ShorteningService(MongoDatabase database, ShortUrlConstructor constructor)  {
+    public ShorteningService(MongoDatabase database, ConfigShortening config) throws NoSuchAlgorithmException {
         this.shortenedUrlDao = new ShortenedUrlDaoImpl(database);
-        this.shortUrlConstructor = constructor;
+        this.shortUrlConstructor = new ShortUrlConstructor(config.baseUrl(),config.hashLen());
     }
 
+    //TODO handle hash collisions
     public CompletableFuture<URL> shortenUrl(URL longUrl) {
         URL shortUrl = shortUrlConstructor.generateShortUrl(longUrl);
         ShortenedUrl shortenedUrl = new ShortenedUrl(shortUrl.toString(),longUrl.toString());
