@@ -3,6 +3,7 @@ package app;
 import app.api.v1.url.ShortenedUrlController;
 import app.config.ConfigDB;
 import app.config.ConfigProvider;
+import app.config.ConfigProviderImpl;
 import app.redirect.RedirectController;
 import app.services.shortening.ShorteningService;
 import app.util.Path;
@@ -12,8 +13,11 @@ import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
 import com.mongodb.async.client.MongoDatabase;
 import io.javalin.Javalin;
+import io.javalin.event.EventType;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.cfg4j.source.context.environment.DefaultEnvironment;
+import org.cfg4j.source.system.EnvironmentVariablesConfigurationSource;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -30,7 +34,8 @@ public class Application {
     public Application(ConfigProvider config) throws NoSuchAlgorithmException {
         app = Javalin.create()
                 .port(config.network().port())
-                .defaultContentType("application/json");
+                .defaultContentType("application/json")
+                .event(EventType.SERVER_STOPPING, e -> { mongoClient.close();});
         setupDB(config.db());
         shorteningService = new ShorteningService(database, config.shortening());
         setupRoutes();
@@ -42,7 +47,6 @@ public class Application {
 
     public void stop() {
         app.stop();
-        mongoClient.close();
     }
 
     private void setupDB(ConfigDB config) {
@@ -78,10 +82,13 @@ public class Application {
         app.error(404,ctx->ctx.result("")); //Default route
     }
 
-    public static void main(String[] args) {
-        Javalin app = Javalin.start(7000);
+    public static void main(String[] args) throws NoSuchAlgorithmException {
 
+        EnvironmentVariablesConfigurationSource source = new EnvironmentVariablesConfigurationSource();
+        source.init();
+        source.getConfiguration(new DefaultEnvironment()).getProperty("URL_SHORTENER_CONFIG");
 
-
+        Application app = new Application(new ConfigProviderImpl(null));
+        app.start();
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Test;
 import util.ConfigRule;
 import util.MongoRule;
 
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 
 import static io.restassured.RestAssured.given;
@@ -29,7 +30,8 @@ public class TestShortenUrl {
 
         app.start();
 
-        RestAssured.baseURI = configRule.getConfig().shortening().baseUrl().toString();
+        String baseUrl = configRule.getConfig().shortening().baseUrl().toString();
+        RestAssured.baseURI = baseUrl;
 
         try {
             CreateShortenedUrlResponse response = given()
@@ -38,7 +40,7 @@ public class TestShortenUrl {
                     .when()
                     .post("/api/v1/url").as(CreateShortenedUrlResponse.class);
             Assert.assertEquals(LONG_URL,response.getLongUrl());
-            System.out.println(response.getShortUrl());
+            Assert.assertTrue(response.getShortUrl().startsWith(baseUrl));
 
             given()
                     .contentType("application/json")
