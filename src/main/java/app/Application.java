@@ -84,11 +84,16 @@ public class Application {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
 
-        EnvironmentVariablesConfigurationSource source = new EnvironmentVariablesConfigurationSource();
-        source.init();
-        source.getConfiguration(new DefaultEnvironment()).getProperty("URL_SHORTENER_CONFIG");
+        //Load config from the file pointed by the environment variable or load defaults
+        ConfigProvider config = ConfigProviderImpl.createFormFileInEnvVarOrDefault("URL_SHORTENER_CONFIG");
 
-        Application app = new Application(new ConfigProviderImpl(null));
+        //Create an application instance
+        Application app = new Application(config);
+
+        //Stop on SIGINT/SIGTERM
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> app.stop()));
+
+        //Start the application
         app.start();
     }
 }
