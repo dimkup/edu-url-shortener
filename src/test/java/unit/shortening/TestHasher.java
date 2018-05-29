@@ -53,7 +53,7 @@ public class TestHasher {
 
     @Test
     public void testHasherProducesSafeOutput() throws NoSuchAlgorithmException, MalformedURLException {
-        Hasher hasher = new Hasher(22);
+        Hasher hasher = new Hasher(20);
         URL url = new URL("https://www.google.com/");
         String hash = hasher.hashUrl(url);
 

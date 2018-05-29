@@ -36,5 +36,18 @@ public class ShortenedUrlController {
                                 }));
     }
 
-    ;
+    public void getShortenedUrl(Context context) throws MalformedURLException {
+        URL shortUrl = new URL(context.queryParam("shortUrl"));
+        context.result(
+                shorteningService
+                        .resolveUrl(shortUrl)
+                .thenApply(longUrl->{try {
+                    return mapper.writeValueAsString(
+                            new CreateShortenedUrlResponse(longUrl.toString(), shortUrl.toString())
+                    );
+                } catch (JsonProcessingException e) {
+                    throw new HaltException(500, "Can't serialize response");
+                }})
+        );
+    }
 }

@@ -10,11 +10,10 @@ import org.junit.Test;
 import util.ConfigRule;
 import util.MongoRule;
 
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 
 public class TestShortenUrl {
     @ClassRule
@@ -34,19 +33,30 @@ public class TestShortenUrl {
         RestAssured.baseURI = baseUrl;
 
         try {
-            CreateShortenedUrlResponse response = given()
+            //Create
+            CreateShortenedUrlResponse createResponse = given()
                     .contentType("application/json")
                     .body(new CreateShortenedUrlRequest(LONG_URL))
                     .when()
                     .post("/api/v1/url").as(CreateShortenedUrlResponse.class);
-            Assert.assertEquals(LONG_URL,response.getLongUrl());
-            Assert.assertTrue(response.getShortUrl().startsWith(baseUrl));
+            Assert.assertEquals(LONG_URL,createResponse.getLongUrl());
+            Assert.assertTrue(createResponse.getShortUrl().startsWith(baseUrl));
 
+            //Get is back
+            CreateShortenedUrlResponse getResponse = given()
+                    .contentType("application/json")
+                    .queryParam("shortUrl",createResponse.getShortUrl())
+                    .when()
+                    .get("/api/v1/url").as(CreateShortenedUrlResponse.class);
+            Assert.assertEquals(LONG_URL,getResponse.getLongUrl());
+            Assert.assertEquals(createResponse.getShortUrl(),getResponse.getShortUrl());
+
+            //Redirect
             given()
                     .contentType("application/json")
                     .when()
                     .redirects().follow(false)
-                    .get(response.getShortUrl())
+                    .get(createResponse.getShortUrl())
                     .then()
                     .body(equalTo(""))
                     .statusCode(302)

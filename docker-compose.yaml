@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  eduurl:
+    restart: always
+    image: dimkup/eduurlshortener:1.0-SNAPSHOT
+    ports:
+      - 7000:7000
+    environment:
+      URL_SHORTENER_CONFIG: /config.yaml
+    volumes:
+      - ${PWD}/config.yaml:/config.yaml
+
+  mongo:
+      restart: always
+      image: mongo:3.4.1

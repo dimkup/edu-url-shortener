@@ -16,8 +16,6 @@ import io.javalin.Javalin;
 import io.javalin.event.EventType;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-import org.cfg4j.source.context.environment.DefaultEnvironment;
-import org.cfg4j.source.system.EnvironmentVariablesConfigurationSource;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -72,14 +70,14 @@ public class Application {
                 path(Path.Web.V1,()->{      // /api/v1
                     path(Path.Web.URL,()->{ // /api/v1/url
                         post(shortenedUrlController::createShortenedUrl);
-                        get(ctx->{});
+                        get(shortenedUrlController::getShortenedUrl);
                     });
                 });
             });
 
         });
 
-        app.error(404,ctx->ctx.result("")); //Default route
+        app.error(404,ctx->ctx.result("the URL has not been found")); //Default route
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {

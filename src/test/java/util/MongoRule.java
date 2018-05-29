@@ -51,6 +51,7 @@ public class MongoRule implements TestRule {
     }
 
     private void tearDown() {
+        _mongo.close();
         _mongod.stop();
         _mongodExe.stop();
     }

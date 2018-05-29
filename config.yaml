@@ -1,0 +1,15 @@
+# Config for Doecker compose start
+
+#mongo db configuration
+db:
+  connectionString: "mongodb://mongo:27017"
+  databaseName: "eduurlshortener"
+
+#server network options
+network:
+  port: 7000
+
+#shortening service options
+shortening:
+  baseUrl: "http://localhost:7000"
+  hashLen: 6
