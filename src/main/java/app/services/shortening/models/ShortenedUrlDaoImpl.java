@@ -25,7 +25,7 @@ public class ShortenedUrlDaoImpl implements ShortenedUrlDao {
         //Create unique index on shortUrl field if does not exist
         IndexOptions indexOptions = new IndexOptions().unique(true);
         shortenedUrlCollection.createIndex(
-                Indexes.text("shortUrl"),
+                Indexes.ascending("shortUrl"),
                 indexOptions,
                 (s, t) -> {if (t!=null) log.error("Can't create index for url collection",t);});
     }

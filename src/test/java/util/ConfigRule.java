@@ -13,7 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ConfigRule implements TestRule {
-    private static final String BASE_URL = "http://localhost:7000/";
+    private static final String BASE_URL = "http://localhost:7001/";
     private ConfigProvider config;
 
     public ConfigProvider getConfig() {return config;};
@@ -60,7 +60,7 @@ public class ConfigRule implements TestRule {
                 return new ConfigNetwork() {
                     @Override
                     public int port() {
-                        return 7000;
+                        return 7001;
                     }
                 };
             }

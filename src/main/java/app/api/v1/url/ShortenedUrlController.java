@@ -26,6 +26,7 @@ public class ShortenedUrlController {
                         .shortenUrl(longUrl)
                         .thenApply(
                                 shortUrl -> {
+                                    context.status(201);
                                     try {
                                         return mapper.writeValueAsString(
                                                 new CreateShortenedUrlResponse(request.getLongUrl(), shortUrl.toString())

@@ -1,14 +1,17 @@
 package app;
 
+import app.api.v1.ErrorResponse;
 import app.api.v1.url.ShortenedUrlController;
 import app.config.ConfigDB;
 import app.config.ConfigProvider;
 import app.config.ConfigProviderImpl;
 import app.redirect.RedirectController;
 import app.services.shortening.ShorteningService;
+import app.services.shortening.exceptions.ShortenedUrlNotFoundException;
 import app.util.Path;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoWriteException;
 import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
 import com.mongodb.async.client.MongoDatabase;
@@ -17,7 +20,9 @@ import io.javalin.event.EventType;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
+import java.net.MalformedURLException;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.CompletionException;
 
 import static io.javalin.ApiBuilder.*;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -34,9 +39,11 @@ public class Application {
                 .port(config.network().port())
                 .defaultContentType("application/json")
                 .event(EventType.SERVER_STOPPING, e -> { mongoClient.close();});
+
         setupDB(config.db());
         shorteningService = new ShorteningService(database, config.shortening());
         setupRoutes();
+        setupExceptions();
     }
 
     public void start() {
@@ -77,7 +84,30 @@ public class Application {
 
         });
 
-        app.error(404,ctx->ctx.result("the URL has not been found")); //Default route
+
+
+    }
+
+    private void setupExceptions() {
+
+        app.exception(MalformedURLException.class,(e, ctx)->{
+            ctx.status(400).json(new ErrorResponse("Can't parse the URL")); //Bad URL in the request
+        });
+
+        app.exception(CompletionException.class, (e, ctx) -> {
+            if (e.getCause() instanceof ShortenedUrlNotFoundException) {//ShortUrl is not found
+                ctx.status(404).json(new ErrorResponse("ShortUrl is not found"));
+
+            } else if (e.getCause() instanceof MalformedURLException) { //we have a bad URL from the DB, let say 500
+                ctx.status(500).json(new ErrorResponse("Inconsistent DB"));
+
+            } else if (e.getCause() instanceof MongoWriteException) { //Could be hash collision - fix it!
+                ctx.status(503).json(new ErrorResponse("Please try again later"));
+
+            } else {
+                ctx.status(500).json(new ErrorResponse("Internal server error"));
+            }
+        });
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
