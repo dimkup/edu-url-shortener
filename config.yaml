@@ -1,4 +1,4 @@
-# Config for Doecker compose start
+# Config for the Docker compose start
 
 #mongo db configuration
 db:
