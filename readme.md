@@ -3,7 +3,7 @@
  written in Java 8 using [Javalin](https://github.com/tipsy/javalin), MongoDB, Maven and Docker.
  It has only REST API and redirect capabilities, no GUI, sorry.
  
-##Features
+## Features
   - REST API - shorten/get
   - redirect with 302/Location
   - Full async - uses Javalin's experimental async feature and MongoDB async client
