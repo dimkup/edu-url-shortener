@@ -83,7 +83,7 @@ shortening:
   baseUrl: "http://localhost:7000" # Constant part of shortened urls
   hashLen: 6 # from 1 to 20, 1 is not recommended!)
 ```
-You can pass URL SHORTENER CONFIG env variable to the container. 
+You can pass URL_SHORTENER_CONFIG env variable to the container. 
 The variable has to contain a full path to the config file.
 
 ## TODO
@@ -91,6 +91,6 @@ The variable has to contain a full path to the config file.
  - Hash collision handling
  - Find already shortened URLs
  - Statistic 
- - RULs expiration 
+ - URLs expiration 
  - Logging
  - Repair Docker-Maven integration
