@@ -6,6 +6,9 @@ import io.javalin.Context;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * Handles redirect requests
+ */
 public class RedirectController {
     private ShorteningService shorteningService;
 

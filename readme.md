@@ -16,7 +16,7 @@
   - Docker engine 18 (optional)
   - Docker compose 1.21 (optional)
   
-  ```text
+```text
 git clone <url>
 mvn package
 docker-compose up
@@ -81,7 +81,7 @@ network:
 #shortening service options
 shortening:
   baseUrl: "http://localhost:7000" # Constant part of shortened urls
-  hashLen: 6 # from 1 to 20, 1 is not recommended!
+  hashLen: 6 # from 1 to 20, 1 is not recommended!)
 ```
 You can pass URL SHORTENER CONFIG env variable to the container. 
 The variable has to contain a full path to the config file.
@@ -93,3 +93,4 @@ The variable has to contain a full path to the config file.
  - Statistic 
  - RULs expiration 
  - Logging
+ - Repair Docker-Maven integration

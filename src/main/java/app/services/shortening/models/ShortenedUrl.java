@@ -3,8 +3,11 @@ package app.services.shortening.models;
 
 import org.bson.types.ObjectId;
 
+/**
+ * Shortened URL model
+ */
 public class ShortenedUrl {
-    private ObjectId id;
+    private ObjectId id; //Unique ID id the MomgoDB collection
     private String shortUrl;
     private String longUrl;
 

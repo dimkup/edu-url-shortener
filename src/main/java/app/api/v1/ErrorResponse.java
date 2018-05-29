@@ -1,5 +1,8 @@
 package app.api.v1;
 
+/**
+ * Basic error response model
+ */
 public class ErrorResponse {
     private String error;
 

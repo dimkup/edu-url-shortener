@@ -28,6 +28,10 @@ import static io.javalin.ApiBuilder.*;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+/**
+ * Main application class
+ * Contains routes and exceptions handling config
+ */
 public class Application {
     private Javalin app;
     private MongoClient mongoClient;
@@ -38,7 +42,8 @@ public class Application {
         app = Javalin.create()
                 .port(config.network().port())
                 .defaultContentType("application/json")
-                .event(EventType.SERVER_STOPPING, e -> { mongoClient.close();});
+                //Close DB connection on shutdown
+                .event(EventType.SERVER_STOPPING, e -> mongoClient.close());
 
         setupDB(config.db());
         shorteningService = new ShorteningService(database, config.shortening());
@@ -46,14 +51,24 @@ public class Application {
         setupExceptions();
     }
 
+    /**
+     * Start the application
+     */
     public void start() {
         app.start();
     }
 
+    /**
+     * Stop the application
+     */
     public void stop() {
         app.stop();
     }
 
+    /**
+     * Creates database client
+     * @param config database configuration instance
+     */
     private void setupDB(ConfigDB config) {
         CodecRegistry pojoCodecRegistry = fromRegistries(MongoClients.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
@@ -65,6 +80,9 @@ public class Application {
         database = mongoClient.getDatabase(config.databaseName());
     }
 
+    /**
+     * Maps paths to handlers
+     */
     private void setupRoutes() {
 
         ShortenedUrlController shortenedUrlController = new ShortenedUrlController(shorteningService);
@@ -88,6 +106,9 @@ public class Application {
 
     }
 
+    /**
+     * Maps exceptions to handlers
+     */
     private void setupExceptions() {
 
         app.exception(MalformedURLException.class,(e, ctx)->{ //Bad URL in the request
@@ -110,6 +131,12 @@ public class Application {
         });
     }
 
+
+    /**
+     * Main entry point
+     * @param args - command line args
+     * @throws NoSuchAlgorithmException
+     */
     public static void main(String[] args) throws NoSuchAlgorithmException {
 
         //Load config from the file pointed by the environment variable or load defaults
@@ -119,7 +146,7 @@ public class Application {
         Application app = new Application(config);
 
         //Stop on SIGINT/SIGTERM
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> app.stop()));
+        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
 
         //Start the application
         app.start();

@@ -11,9 +11,11 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.mongodb.client.model.Filters.eq;
 
-
+/**
+ * Implementation of the ShortenedUrlDao
+ */
 public class ShortenedUrlDaoImpl implements ShortenedUrlDao {
-    public static final String SHORTENED_URL_COLLECTION_NAME = "urls";
+    public static final String SHORTENED_URL_COLLECTION_NAME = "urls"; //Collection name
 
     private static Logger log = LoggerFactory.getLogger(ShortenedUrlDaoImpl.class);
 

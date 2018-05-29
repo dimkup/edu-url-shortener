@@ -9,6 +9,9 @@ import io.javalin.HaltException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * Handles shortened URLs create adn get requests
+ */
 public class ShortenedUrlController {
     private final ObjectMapper mapper = new ObjectMapper();
     private ShorteningService shorteningService;

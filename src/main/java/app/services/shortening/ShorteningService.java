@@ -13,16 +13,31 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Shortening service - Creates shortened URLs and resolves short ones to the long ones
+ */
 public class ShorteningService {
     private ShortenedUrlDao shortenedUrlDao;
     private ShortUrlConstructor shortUrlConstructor;
 
+    /**
+     * Shortening Service constructor
+     * @param database - instance of MongoDatabase
+     * @param config - shortening related configuration
+     * @throws NoSuchAlgorithmException
+     */
     public ShorteningService(MongoDatabase database, ConfigShortening config) throws NoSuchAlgorithmException {
         this.shortenedUrlDao = new ShortenedUrlDaoImpl(database);
         this.shortUrlConstructor = new ShortUrlConstructor(config.baseUrl(),config.hashLen());
     }
 
     //TODO handle hash collisions
+
+    /**
+     * Creates a shortened URL from the long one
+     * @param longUrl
+     * @return shortUrl
+     */
     public CompletableFuture<URL> shortenUrl(URL longUrl) {
         URL shortUrl = shortUrlConstructor.generateShortUrl(longUrl);
         ShortenedUrl shortenedUrl = new ShortenedUrl(shortUrl.toString(),longUrl.toString());
@@ -31,6 +46,11 @@ public class ShorteningService {
                 .thenApply(v-> shortUrl);
     }
 
+    /**
+     * Looks for the long URL by the short one
+     * @param shortUrl
+     * @return longUrl
+     */
     public CompletableFuture<URL> resolveUrl(URL shortUrl) {
         return shortenedUrlDao
                 .getShortenedUrlByShortUrlAsyc(shortUrl.toString())
