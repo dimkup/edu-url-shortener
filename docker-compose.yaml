@@ -4,6 +4,7 @@ services:
   eduurl:
     restart: always
     image: dimkup/eduurlshortener:1.0-SNAPSHOT
+    build: .
     ports:
       - 7000:7000
     environment:

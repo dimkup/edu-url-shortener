@@ -90,8 +90,8 @@ public class Application {
 
     private void setupExceptions() {
 
-        app.exception(MalformedURLException.class,(e, ctx)->{
-            ctx.status(400).json(new ErrorResponse("Can't parse the URL")); //Bad URL in the request
+        app.exception(MalformedURLException.class,(e, ctx)->{ //Bad URL in the request
+            ctx.status(400).json(new ErrorResponse("Can't parse the URL"));
         });
 
         app.exception(CompletionException.class, (e, ctx) -> {
@@ -104,7 +104,7 @@ public class Application {
             } else if (e.getCause() instanceof MongoWriteException) { //Could be hash collision - fix it!
                 ctx.status(503).json(new ErrorResponse("Please try again later"));
 
-            } else {
+            } else { //Default for unhandled async exceptions
                 ctx.status(500).json(new ErrorResponse("Internal server error"));
             }
         });
