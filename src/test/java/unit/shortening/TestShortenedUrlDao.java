@@ -70,4 +70,27 @@ public class TestShortenedUrlDao  {
         db.drop((aVoid,t)->{if (t!=null) cf.completeExceptionally(t); else cf.complete(null);});
         cf.join();
     }
+
+    @Test
+    public void testShortenedUrlDaoCreateMultiple() {
+        final String DBNAME = "test";
+        final ShortenedUrl model1 = new ShortenedUrl("http://goo.gl/jjksdajf","http://www.cisco.com/");
+        final ShortenedUrl model2 = new ShortenedUrl("http://goo.gl/jjksdsjf","http://www.google.com/");
+        final ShortenedUrl model3 = new ShortenedUrl("http://goo.gl/12345678","http://www.facebook.com/");
+
+
+        //Setup
+        MongoDatabase db = mongoRule.getMongo().getDatabase(DBNAME);
+        ShortenedUrlDao sud = new ShortenedUrlDaoImpl(db);
+
+        //Create a model in the database
+        sud.createShortenedUrlAsync(model1).join();
+        sud.createShortenedUrlAsync(model2).join();
+        sud.createShortenedUrlAsync(model3).join();
+
+        //Drop db
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        db.drop((aVoid,t)->{if (t!=null) cf.completeExceptionally(t); else cf.complete(null);});
+        cf.join();
+    }
 }
