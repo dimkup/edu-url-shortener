@@ -9,6 +9,7 @@ import app.redirect.RedirectController;
 import app.services.shortening.ShorteningService;
 import app.services.shortening.exceptions.ShortenedUrlNotFoundException;
 import app.util.Path;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoWriteException;
@@ -113,6 +114,9 @@ public class Application {
 
         app.exception(MalformedURLException.class,(e, ctx)->{ //Bad URL in the request
             ctx.status(400).json(new ErrorResponse("Can't parse the URL"));
+        });
+        app.exception(JsonParseException.class,(e, ctx)->{ //Bad request body
+            ctx.status(400).json(new ErrorResponse("Bad request"));
         });
 
         app.exception(CompletionException.class, (e, ctx) -> {

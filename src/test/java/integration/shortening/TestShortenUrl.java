@@ -141,4 +141,31 @@ public class TestShortenUrl {
                 .body("error", is("Can't parse the URL"));
 
     }
+
+    @Test
+    public void testServiceShouldRetrun400ForJunkRequest() {
+        final String JUNK = "hakfvsldnvjknskdnfvds";
+
+
+        //Try Create
+        given()
+                .contentType("application/json")
+                .body(JUNK)
+                .when()
+                .post("/api/v1/url")
+                .then()
+                .assertThat().statusCode(400)
+                .body("error", is("Bad request"));
+
+        //Ask for missing URL
+        given()
+                .contentType("application/json")
+                .queryParam("junk", JUNK)
+                .when()
+                .get("/api/v1/url").peek()
+                .then()
+                .assertThat().statusCode(400)
+                .body("error", is("Can't parse the URL"));
+
+    }
 }
