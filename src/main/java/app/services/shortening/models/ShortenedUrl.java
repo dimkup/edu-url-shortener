@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
  * Shortened URL model
  */
 public class ShortenedUrl {
-    private ObjectId id; //Unique ID id the MomgoDB collection
+    private ObjectId id; //Unique ID in the MomgoDB collection
     private String shortUrl;
     private String longUrl;
 

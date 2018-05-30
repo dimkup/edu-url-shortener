@@ -52,14 +52,14 @@ public class Application {
     }
 
     /**
-     * Start the application
+     * Starts the application
      */
     public void start() {
         app.start();
     }
 
     /**
-     * Stop the application
+     * Stops the application
      */
     public void stop() {
         app.stop();

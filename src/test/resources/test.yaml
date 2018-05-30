@@ -2,11 +2,9 @@ db:
   connectionString: "mongodb://localhost:27018"
   databaseName: "eduurlshortener"
 
-#server network options
 network:
   port: 7001
 
-#shortening service options
 shortening:
   baseUrl: "http://localhost:7001"
   hashLen: 7

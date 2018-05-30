@@ -1,5 +1,4 @@
 # Default configuration file
-# Use command line parameter in order to use alternative
 
 #mongo db configuration
 db:

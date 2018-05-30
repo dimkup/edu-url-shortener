@@ -10,7 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Handles shortened URLs create adn get requests
+ * Handles shortened URLs create and get requests
  */
 public class ShortenedUrlController {
     private final ObjectMapper mapper = new ObjectMapper();
