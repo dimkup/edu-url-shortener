@@ -1,10 +1,7 @@
 package app.api.v1.url;
 
 import app.services.shortening.ShorteningService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Context;
-import io.javalin.HaltException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,7 +10,6 @@ import java.net.URL;
  * Handles shortened URLs create and get requests
  */
 public class ShortenedUrlController {
-    private final ObjectMapper mapper = new ObjectMapper();
     private ShorteningService shorteningService;
 
     public ShortenedUrlController(ShorteningService shorteningService) {
@@ -29,14 +25,9 @@ public class ShortenedUrlController {
                         .shortenUrl(longUrl)
                         .thenApply(
                                 shortUrl -> {
-                                    context.status(201);
-                                    try {
-                                        return mapper.writeValueAsString(
-                                                new CreateShortenedUrlResponse(request.getLongUrl(), shortUrl.toString())
-                                        );
-                                    } catch (JsonProcessingException e) {
-                                        throw new HaltException(500, "Can't serialize response");
-                                    }
+                                    context.status(201).json(new CreateShortenedUrlResponse(request.getLongUrl(), shortUrl.toString()));
+                                    return null;
+
                                 }));
     }
 
@@ -45,13 +36,10 @@ public class ShortenedUrlController {
         context.result(
                 shorteningService
                         .resolveUrl(shortUrl)
-                .thenApply(longUrl->{try {
-                    return mapper.writeValueAsString(
-                            new CreateShortenedUrlResponse(longUrl.toString(), shortUrl.toString())
-                    );
-                } catch (JsonProcessingException e) {
-                    throw new HaltException(500, "Can't serialize response");
-                }})
+                        .thenApply(longUrl -> {
+                            context.json(new CreateShortenedUrlResponse(longUrl.toString(), shortUrl.toString()));
+                            return null;
+                        })
         );
     }
 }
