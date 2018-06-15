@@ -10,6 +10,7 @@ import com.mongodb.async.client.MongoDatabase;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,9 +25,8 @@ public class ShorteningService {
      * Shortening Service constructor
      * @param database - instance of MongoDatabase
      * @param config - shortening related configuration
-     * @throws NoSuchAlgorithmException
      */
-    public ShorteningService(MongoDatabase database, ConfigShortening config) throws NoSuchAlgorithmException {
+    public ShorteningService(MongoDatabase database, ConfigShortening config) {
         this.shortenedUrlDao = new ShortenedUrlDaoImpl(database);
         this.shortUrlConstructor = new ShortUrlConstructor(config.baseUrl(),config.hashLen());
     }

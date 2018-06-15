@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class TestHasher {
 
     @Test
-    public void testHasherThrowsExceptionIfHashLengthIsWrong() throws NoSuchAlgorithmException {
+    public void testHasherThrowsExceptionIfHashLengthIsWrong()  {
         try {
             new Hasher(23);
             Assert.fail("Expected an IllegalArgumentException to be thrown");
@@ -30,7 +30,7 @@ public class TestHasher {
     }
 
     @Test
-    public void testHasherCalculatesHashForUrl() throws NoSuchAlgorithmException, MalformedURLException {
+    public void testHasherCalculatesHashForUrl() throws MalformedURLException {
         Hasher hasher = new Hasher(10);
         URL url = new URL("https://www.google.com/");
         String hash = hasher.hashUrl(url);
@@ -39,7 +39,7 @@ public class TestHasher {
     }
 
     @Test
-    public void testHasherUsesSalt() throws NoSuchAlgorithmException, MalformedURLException {
+    public void testHasherUsesSalt() throws  MalformedURLException {
         Hasher hasher = new Hasher(10);
         URL url = new URL("https://www.google.com/");
         String hash1 = hasher.hashUrl(url);
@@ -52,7 +52,7 @@ public class TestHasher {
     }
 
     @Test
-    public void testHasherProducesSafeOutput() throws NoSuchAlgorithmException, MalformedURLException {
+    public void testHasherProducesSafeOutput() throws MalformedURLException {
         Hasher hasher = new Hasher(20);
         URL url = new URL("https://www.google.com/");
         String hash = hasher.hashUrl(url);

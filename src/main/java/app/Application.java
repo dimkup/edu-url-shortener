@@ -39,7 +39,7 @@ public class Application {
     private MongoDatabase database;
     private ShorteningService shorteningService;
 
-    public Application(ConfigProvider config) throws NoSuchAlgorithmException {
+    public Application(ConfigProvider config) {
         app = Javalin.create()
                 .port(config.network().port())
                 .defaultContentType("application/json")
@@ -139,9 +139,8 @@ public class Application {
     /**
      * Main entry point
      * @param args - command line args
-     * @throws NoSuchAlgorithmException
      */
-    public static void main(String[] args) throws NoSuchAlgorithmException {
+    public static void main(String[] args) {
 
         //Load config from the file pointed by the environment variable or load defaults
         ConfigProvider config = ConfigProviderImpl.createFormFileInEnvVarOrDefault("URL_SHORTENER_CONFIG");

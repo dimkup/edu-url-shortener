@@ -1,7 +1,6 @@
 package unit.shortening;
 
 import app.config.ConfigShortening;
-import app.services.shortening.ShortUrlConstructor;
 import app.services.shortening.ShorteningService;
 import app.services.shortening.exceptions.ShortenedUrlNotFoundException;
 import com.mongodb.async.client.MongoDatabase;
@@ -12,7 +11,6 @@ import util.MongoRule;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletionException;
 
 public class TestUrlShorteningService {
@@ -20,7 +18,7 @@ public class TestUrlShorteningService {
     public static final MongoRule mongoRule = new MongoRule();
 
     @Test
-    public void testUrlShorteningServiceShortResolve() throws NoSuchAlgorithmException, MalformedURLException {
+    public void testUrlShorteningServiceShortResolve() throws MalformedURLException {
         final String LONG_URL = "http://www.cisco.com/api?q=akfvsldnvjknskdnfvds";
         final String BASE_URL = "http://goo.gl";
         final String DBNAME = "test";
@@ -57,7 +55,7 @@ public class TestUrlShorteningService {
     }
 
     @Test
-    public void testUrlShorteningServiceResolveMissing() throws NoSuchAlgorithmException, MalformedURLException {
+    public void testUrlShorteningServiceResolveMissing() throws MalformedURLException {
         final String SHORT_URL = "http://goo.gl/akfvsld";
         final String BASE_URL = "http://goo.gl";
         final String DBNAME = "test";

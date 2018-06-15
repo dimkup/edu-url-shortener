@@ -6,11 +6,10 @@ import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
 
 public class TestShortUrlConstructor {
     @Test
-    public void testShortUrlConstructorConstruct() throws MalformedURLException, NoSuchAlgorithmException {
+    public void testShortUrlConstructorConstruct() throws MalformedURLException {
         final String BASE_URL = "http://exa.mpl";
         final String LONG_URL = "https://developer.ibm.com/code/open/projects/activity-streams/";
         URL baseUrl = new URL(BASE_URL);

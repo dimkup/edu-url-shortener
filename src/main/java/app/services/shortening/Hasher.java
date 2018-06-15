@@ -1,5 +1,6 @@
 package app.services.shortening;
 
+import app.services.shortening.exceptions.UncheckedNoSuchAlgorithmException;
 import io.seruco.encoding.base62.Base62;
 
 import java.net.URL;
@@ -12,19 +13,28 @@ import java.util.Random;
  */
 public class Hasher {
     private final int hashLength;
-    private final MessageDigest md;
     private final Random random;
     private final Base62 base62;
+    private final ThreadLocal<MessageDigest> md;
 
     /**
      * Hasher constructor
      * @param hashLength desired length of the hash string
-     * @throws NoSuchAlgorithmException
      */
-    public Hasher(int hashLength) throws NoSuchAlgorithmException {
+    public Hasher(int hashLength) {
         this.hashLength = hashLength;
         if (hashLength<1||hashLength>20) throw new IllegalArgumentException("Hash length must be less than 31 characters");
-        this.md = MessageDigest.getInstance("MD5");
+
+        this.md = ThreadLocal.withInitial(() -> {
+            try {
+                return MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new UncheckedNoSuchAlgorithmException("MD5 is not available",e);
+            }
+        });
+
+        this.md.get(); //Throw exception if MD5 is not available
+
         this.random = new Random();
         this.base62 = Base62.createInstance();
     }
@@ -36,9 +46,8 @@ public class Hasher {
      */
     public String hashUrl(URL url) {
         byte[] b = (url+generateSalt()).getBytes();
-        synchronized (md) {
-            b = md.digest(b);
-        }
+        b = md.get().digest(b);
+
         return new String(base62.encode(b)).substring(0,hashLength);
     }
 

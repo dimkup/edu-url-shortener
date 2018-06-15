@@ -17,9 +17,8 @@ public class ShortUrlConstructor {
      * Creates ShortUrlConstructor
      * @param baseUrl - base url part for all short URLs
      * @param hashLen - hash length in characters
-     * @throws NoSuchAlgorithmException
      */
-    public ShortUrlConstructor(URL baseUrl, int hashLen) throws NoSuchAlgorithmException {
+    public ShortUrlConstructor(URL baseUrl, int hashLen) {
         this.hasher = new Hasher(hashLen);
         this.baseUrl= baseUrl;
     }
