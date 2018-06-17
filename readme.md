@@ -88,7 +88,6 @@ The variable has to contain a full path to the config file.
 
 ## TODO
  - Authorization
- - Hash collision handling
  - Find already shortened URLs
  - Statistic 
  - URLs expiration 
